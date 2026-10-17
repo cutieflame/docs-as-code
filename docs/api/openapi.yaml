@@ -1,0 +1,126 @@
+openapi: 3.0.3
+info:
+  title: Movie Recommendation API
+  description: API рекомендательной системы фильмов
+  version: 1.0.0
+servers:
+  - url: https://example.com/api/v1
+paths:
+  /recommendations:
+    post:
+      summary: Сформировать рекомендации
+      description: Передаёт оценки пользователя ML-модели и возвращает список фильмов.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: integer
+                  example: 42
+                limit:
+                  type: integer
+                  example: 5
+      responses:
+        '200':
+          description: Рекомендации сформированы
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recommendation'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: ML-модель временно недоступна
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: MODEL_UNAVAILABLE
+                message: Model is temporarily unavailable
+  /recommendations/{userId}:
+    get:
+      summary: Получить последние рекомендации пользователя
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 42
+      responses:
+        '200':
+          description: Рекомендации найдены
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recommendation'
+        '404':
+          description: Пользователь не найден
+  /movies/{movieId}:
+    get:
+      summary: Получить карточку фильма
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 603
+      responses:
+        '200':
+          description: Фильм найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: Фильм не найден
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 603
+        title:
+          type: string
+          example: Матрица
+        year:
+          type: integer
+          example: 1999
+    Recommendation:
+      type: object
+      properties:
+        movie:
+          $ref: '#/components/schemas/Movie'
+        score:
+          type: number
+          format: float
+          example: 0.92
+        modelVersion:
+          type: string
+          example: recsys-2.1
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: INVALID_REQUEST
+        message:
+          type: string
+          example: userId is required
