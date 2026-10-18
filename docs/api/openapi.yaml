@@ -9,7 +9,7 @@ paths:
   /recommendations:
     post:
       summary: Сформировать рекомендации
-      description: Передаёт оценки пользователя ML-модели и возвращает список фильмов.
+      description: Формирует рекомендации для пользователя на основе его сохранённых оценок.
       requestBody:
         required: true
         content:
@@ -58,7 +58,7 @@ paths:
           required: true
           schema:
             type: integer
-          example: 42
+            example: 42
       responses:
         '200':
           description: Рекомендации найдены
@@ -79,7 +79,7 @@ paths:
           required: true
           schema:
             type: integer
-          example: 603
+            example: 603
       responses:
         '200':
           description: Фильм найден
